@@ -33,11 +33,19 @@ class ChatChannel < ApplicationCable::Channel
 
   private
     def announce_user
+      last_messages = room.messages.order(created_at: :desc).limit(5)
       ChatChannel.broadcast_to room, message: {
         type: 'user-joined',
         data: {
           name: current_user.name,
-          current: room.subscribers.map{|s| s.name}
+          current: room.subscribers.map{|s| s.name},
+          lastMessages: last_messages.reverse.map do |m|
+            {
+              user: m.user.name,
+              message: m.content,
+              timestamp: m.created_at
+            }
+          end
         }
       }.to_json
     end
