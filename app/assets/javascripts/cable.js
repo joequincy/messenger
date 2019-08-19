@@ -14,6 +14,9 @@
       data['current'].forEach(name => {
         App.elms.userList.appendChild(new UserListItem({'name': name}))
       })
+      data['lastMessages'].forEach(message => {
+        App.elms.messageWindow.appendChild(new ChatMessage(message))
+      })
     } else {
       App.elms.userList.appendChild(new UserListItem(data))
     }
