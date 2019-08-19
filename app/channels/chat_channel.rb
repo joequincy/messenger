@@ -2,7 +2,6 @@ class ChatChannel < ApplicationCable::Channel
   on_subscribe :announce_user
 
   def subscribed
-    room = Room.find_or_create_by(name: params[:room])
     room.users << current_user
     ensure_confirmation_sent
     stream_for room
@@ -17,5 +16,9 @@ class ChatChannel < ApplicationCable::Channel
           current: room.subscribers.map{|s| s.name}
         }
       }.to_json
+    end
+
+    def room
+      @_room ||= Room.find_or_create_by(name: params[:room])
     end
 end
