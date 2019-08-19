@@ -5,3 +5,13 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+names = %w[Del Dianna Nanette Orlando Paula Candace Dalton Norma Bernice Sheri Molly Fredrick Bessie Janice Lucy Twila Diane Gretchen Trina Marcel]
+names.each do |name|
+  User.create(name: name)
+end
+
+topics = %w[Chatting Coding Rails Ruby Javascript Node Express Guild Education]
+topics.each do |name|
+  Room.create(name: name)
+end

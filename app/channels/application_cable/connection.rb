@@ -9,7 +9,7 @@ module ApplicationCable
     private
       def find_user
         begin
-          User.find(request.params[:id])
+          User.find_by!(name: request.params['name'])
         rescue
           reject_unauthorized_connection
         end

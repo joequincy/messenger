@@ -5,7 +5,7 @@ describe ApplicationCable::Connection, type: :channel do
     user = User.create(name: "Example")
     room = Room.create(name: "Coding")
     connect "/ws", params: {
-      id: user.id,
+      name: user.name,
       room: room.name
     }
 

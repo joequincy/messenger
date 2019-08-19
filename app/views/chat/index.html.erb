@@ -6,6 +6,10 @@
     Choose your handle:
     <%= tag.input id: 'userNameInput' %>
     <%= tag.button id: 'userNameSubmit' do %>Set<% end %>
+    <br/>
+    <%= tag.span class: 'userNameOptions' do %>
+      The following names are available: Del, Dianna, Nanette, Orlando, Paula, Candace, Dalton, Norma, Bernice, Sheri, Molly, Fredrick, Bessie, Janice, Lucy, Twila, Diane, Gretchen, Trina, Marcel
+    <% end %>
   <% end %>
   <%= tag.section class: 'roomList hidden' do %>
     Current Rooms:
