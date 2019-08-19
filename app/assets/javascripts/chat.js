@@ -34,5 +34,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
         room: room
       })
     })
+
+    App.elms.chatSubmit.addEventListener('click', () => {
+      App.sendMessage(App.elms.chatInput.value)
+    })
   }).call(this);
 })
