@@ -1,36 +1,57 @@
-### Engineering Project
+### Take-Home Code Challenge
+This repository is for a challenge from a prospective employer. To prevent misuse, no specific company or individuals are named. The salient details from the [prompt](#prompt) are given at the bottom of this README.
 
-#### Build a Simple Messenger Application
-We'd like you to build a very simple messenger web app that performs a specific set of functionality
-in a desktop browser or mobile browser.
+### Setup
+This challenge was completed using:
+- Ruby 2.5.5
+- Rails 5.2.3
+- PostgreSQL 11.2
 
-#### Messenger Application High Level Requirements
-An application that allows two users to send short text messages to each other, like Facebook
-Messages app or Google Chat.
+To set up for demonstration:
+- clone this repository, `cd` into the project root, and run
+- `bundle install`
+- `rails db:{create,migrate,seed}`
+- `rails s`
+
+### Process
+
+##### Preparation
+Prior to receiving the challenge, I had spoken with the team lead at a high level about the use of AWS API Gateway and Lambda in the current tech stack at the company. After receiving the challenge, I initially looked into using a new framework "Jets" as it is designed specifically for that purpose. In the short time I allocated for this, I learned that Jets does not currently support Websockets. Given that modern applications are likely to use Websockets for continuous communication and fall back to long polling when necessary, I felt it was wiser to do this challenge as a traditional Rails application.
+
+##### Database
+At that point, I started by thinking about what I wanted to build.  
+- I decided I wanted to have Users, but signup and login would be implemented elsewhere on the site. I pre-seeded a set of users and added a field to type in the username prior to joining any channels.  
+- A chat application can work as a single room, however I wanted to explore using multiple rooms so I created a new table for Rooms and pre-seeded it with a set of topics.  
+- I also wanted to be able to maintain a chat history for scrollback. Because of this, I created a table for Messages which references both a user and a room, and contains "content".  
+- Finally, I wanted to be able to provide a list of current participants in the room. I set up a quick join table for Subscribers which references both a user and a room. Unlike Messages, Subscribers are deleted when a user leaves a room.
+
+This leaves me with the below Schema:
+[![Schema Image](schema.png)](https://dbdiagram.io/d/5d5b06efced98361d6ddbab6)
+
+##### Testing
+I referenced prior projects to make sure I had the right set of gems and serve as examples for using matchers like `have_broadcasted_to().with{}`. Throughout the challenge, I followed TDD practices while building out the back end. For the front end, I have not yet learned any tools for testing UI interaction that involves Javascript, so I tested manually with 1 to 4 browser windows.
+
+##### Interaction
+Normally a user would have an account and be logged in prior to visiting the chat area. For this challenge, I made a quick and dirty workaround for this by hiding the chat area until the user types in a name and clicks the "Set" button. After clicking, the connection is readied and the UI changes to show the chatroom options.
+
+The user can now select any existing chat room, or enter their own. The application will prefer the value of the `Create Room` field so long as it is not empty. Once the user clicks `Join`, they will be added into the room. With more time, I would validate that the entered room name adheres to guidelines defined by business needs.
+
+When users join or leave the room, their presence change is announced in the main chat window. This message has a different CSS class from other messages so that it can be targeted for unique styling. Additionally, their names are (respectively) appended to and removed from the User List displayed to the left of the main chat window. This allows users to easily see who is participating at any time.
+
+Included in the `user-joined` broadcast are a collection of the last 5 messages for the room and a collection of the current users in the room. I elected to include these in the Websockets interface to limit the breadth of the application, but in a real-world application it wouldn't make sense to re-broadcast this content to users who are already present in the room. I would instead take the approach to create one or two RESTful API endpoint(s) that the joining user could use to fetch those details when they first join.
+
+##### Next Steps
+
+As previously mentioned, I do not have an interaction pattern for users registering or logging in, so I am simply using names as an identifier for establishing a connection. I would want to instead use an encrypted cookie set elsewhere in the application with a unique identifier.
+
+I saved Messages to the database for the purpose of allowing for scrollback, where a user can retrieve message history for the channel. In a production application, I would want to have an API endpoint to get a paginated collection of messages. I would detect users attempting to scroll up while near or at the top of the message window, and then retrieve messages prior to the earliest shown. This would use the timestamp of the earliest message for filtering.
+
+### Prompt
+Build a very simple chat/messaging app that performs a specific set of functionality in a desktop browser or mobile browser. This should allow two users to send short text messages to each other, like Facebook Messages app or Google Chat.
 - It's possible to type a short message and have it sent to another user
 - It's possible to see messages sent from another user appear reasonably soon after they were sent
 
-#### Other Considerations
-For each idea here are some additional considerations to help you decide what and how much to
-build:
+##### Considerations
 - This should be extremely basic, certainly more so than the example apps above
-- We're only expecting a few hours to a half day of effort, though you're free to spend more if inspired
-- Any functionality beyond the core features above is strictly optional but we'd be lying to say we're not impressed by something really cool you sneak in, whether it's from existing apps or your own idea entirely
 - Don't spend much if any time on accounts, users, or registration; it's perfectly fine to have one or two "hardcoded" accounts that simply work with each other
 - Don't spend much if any time on graphics or visual appeal; we are looking at functionality, testing, coding style, and design decisions more than appearance
-- It will likely need some type of services and storage but what this is remains entirely up to you: it can use a rudimentary server, third-party/existing services, or anything else that gets the job done as long as you can explain why you picked it
-- It can be very hacked together and have bugs; we don't expect anything close to release quality and in fact we'd love to hear what went wrong and what you'd do differently on a second attempt, but you'll impress us more if you know these limitations versus "discover" them with us during the demo
-
-#### Ground Rules
-We'd also like to set some ground rules to keep this as fair as possible:
-- This should be original code rather than something you've written previously, borrowed from a friend, or found on the internet, though incorporating open source or third-party code is fine as long as it's clearly distinguishable from original code
-- This should be done by yourself, meaning you can use all of the example code, docs, and resources of the internet but understand we'll pour over it thoroughly for both style and content and you really don't want to be caught not being able explain something you've just claimed to have written!
-
-#### Other Caveats
-And finally, don't sweat this too much! Here are a few other things to keep in mind:
-- If you get really stuck and don't feel like you can finish this in a short amount of time (or at all), that's fine; just build what you can and supplement it with a detailed written description/design on where things ended up, where you would go next with more time, and be ready to talk about it
-- At any point if you'd like help or feedback with something you're stuck on feel free to reach out to me by email (pretend I'm another experienced engineer on your team but not on the same project); how much help you want is up to you, and while asking questions is not viewed negatively we love seeing how much you can accomplish by yourself even if it's not ideal since we all do a lot of self- directed learning at a startup!
-#### Evaluation
-- Final code project in a ready to build/run state along with instructions, notes, and any related documentation should be checked into a public GitHub project with the link emailed to me for our team to review
-- We may or may not use in-office interview time to discuss your solution, so assume that we won't and that what you've included may be the only explanation seen by multiple technical people on our team
-- Creativity, clarity, design decisions, understanding the challenges of the problem, and being able to extrapolate further if/when we discuss it are more important than the volume of code written
