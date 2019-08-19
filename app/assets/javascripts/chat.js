@@ -25,5 +25,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
       App.elms.roomChooser.classList.toggle('hidden')
       App.elms.chatWindow.classList.toggle('hidden')
     })
+
+    App.elms.chooseRoom.addEventListener('click', () => {
+      let room = (App.elms.roomInput.value != '')? App.elms.roomInput.value : App.elms.roomList.value
+      App.subscribe({
+        channel: 'ChatChannel',
+        user: App.userName,
+        room: room
+      })
+    })
   }).call(this);
 })
