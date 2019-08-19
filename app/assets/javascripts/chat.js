@@ -28,16 +28,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     App.elms.chooseRoom.addEventListener('click', () => {
       let room = (App.elms.roomInput.value != '')? App.elms.roomInput.value : App.elms.roomList.value
-      if(App.room){
+      if(App.room && App.room.name != room){
         App.room.unsubscribe()
         App.elms.messageWindow.innerHTML = ''
         App.elms.userList.innerHTML = ''
+      } else if(App.room){
+        // attempting to change to same room, do nothing
+      } else {
+        App.subscribe({
+          channel: 'ChatChannel',
+          user: App.userName,
+          room: room
+        })
       }
-      App.subscribe({
-        channel: 'ChatChannel',
-        user: App.userName,
-        room: room
-      })
     })
 
     App.elms.chatSubmit.addEventListener('click', () => {

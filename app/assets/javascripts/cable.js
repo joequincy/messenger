@@ -34,6 +34,7 @@
 
   App.subscribe = (details) => {
     App.room = App.cable.subscriptions.create(details, {
+      name: details.room,
       connected: () => {
         //connected
       },
