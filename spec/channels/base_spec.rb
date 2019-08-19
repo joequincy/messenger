@@ -64,6 +64,16 @@ describe ChatChannel, type: :channel do
       }
   end
 
+  it 'does not mix rooms' do
+    stub_connection current_user: user
+
+    expect{subscribe room: room.name}
+      .to have_broadcasted_to(room)
+
+    expect{subscribe room: 'Not' + room.name}
+      .to_not have_broadcasted_to(room)
+  end
+
   it 'relays a message' do
     stub_connection current_user: user
     subscribe room: room.name
