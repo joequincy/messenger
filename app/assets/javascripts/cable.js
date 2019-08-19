@@ -14,8 +14,12 @@
     App.elms.userList.appendChild(new UserListItem(data))
   }
 
+  App.appendMessage = (data) => {
+    App.elms.messageWindow.appendChild(new ChatMessage(data))
+  }
+
   App.subscribe = (details) => {
-    App.cable.subscriptions.create(details, {
+    App.room = App.cable.subscriptions.create(details, {
       connected: () => {
         //connected
       },
@@ -35,6 +39,10 @@
         }
       }
     })
+
+    App.sendMessage = (text) => {
+      App.room.perform("send_message", {text: text})
+    }
   }
 
 }).call(this);
