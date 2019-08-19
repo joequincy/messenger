@@ -40,5 +40,27 @@ describe ChatChannel, type: :channel do
         }
         expect(payload).to eq(expected)
       }
+
+    next_user = User.create(name: 'YetAnotherExampleUser')
+    stub_connection current_user: next_user
+
+    expect{subscribe room: room.name}
+      .to have_broadcasted_to(room)
+      .from_channel(ChatChannel)
+      .once
+      .with{ |data|
+        message = JSON.parse(data[:message], symbolize_names: true)
+        expect(message[:type]).to eq("user-joined")
+
+        payload = message[:data]
+        expected = {
+          name: next_user.name,
+          current: [
+            user.name,
+            next_user.name
+          ]
+        }
+        expect(payload).to eq(expected)
+      }
   end
 end
