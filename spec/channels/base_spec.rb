@@ -64,6 +64,27 @@ describe ChatChannel, type: :channel do
       }
   end
 
+  it 'broadcasts users leaving' do
+    stub_connection current_user: user
+    subscribe room: room.name
+
+    expect{unsubscribe}
+      .to have_broadcasted_to(room)
+      .from_channel(ChatChannel)
+      .once
+      .with{ |data|
+        message = JSON.parse(data[:message], symbolize_names: true)
+        expect(message[:type]).to eq("user-left")
+
+        payload = message[:data]
+        expected = {
+          name: user.name,
+          current: []
+        }
+        expect(payload).to eq(expected)
+      }
+  end
+
   it 'does not mix rooms' do
     stub_connection current_user: user
 
