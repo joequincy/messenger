@@ -10,8 +10,14 @@
   this.App || (this.App = {});
 
   App.announceUser = (data) => {
+    if(App.elms.userList.children.length == 0){
+      data['current'].forEach(name => {
+        App.elms.userList.appendChild(new UserListItem({'name': name}))
+      })
+    } else {
+      App.elms.userList.appendChild(new UserListItem(data))
+    }
     App.elms.messageWindow.appendChild(new UserArrivedMessage(data))
-    App.elms.userList.appendChild(new UserListItem(data))
   }
 
   App.appendMessage = (data) => {
