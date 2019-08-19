@@ -8,6 +8,27 @@
 (function() {
   this.App || (this.App = {});
 
-  App.cable = ActionCable.createConsumer();
+  App.subscribe = (details) => {
+    App.cable.subscriptions.create(details, {
+      connected: () => {
+        //connected
+      },
+      received: (raw) => {
+        let message = JSON.parse(raw.message)
+        switch(message['type']){
+          case 'user-joined':
+            App.announceUser(message['data'])
+            break
+          case 'user-left':
+            App.announceExit(message['data'])
+            break
+          case 'message':
+            App.appendMessage(message['data'])
+            break
+          default:
+        }
+      }
+    })
+  }
 
 }).call(this);
