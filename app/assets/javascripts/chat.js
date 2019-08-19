@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     App.elms.chooseRoom.addEventListener('click', () => {
       let room = (App.elms.roomInput.value != '')? App.elms.roomInput.value : App.elms.roomList.value
+      if(App.room){
+        App.room.unsubscribe()
+        App.elms.messageWindow.innerHTML = ''
+        App.elms.userList.innerHTML = ''
+      }
       App.subscribe({
         channel: 'ChatChannel',
         user: App.userName,
