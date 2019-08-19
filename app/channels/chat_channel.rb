@@ -7,6 +7,18 @@ class ChatChannel < ApplicationCable::Channel
     stream_for room
   end
 
+  def unsubscribed
+    room.users.delete(current_user)
+    room.reload
+    ChatChannel.broadcast_to room, message: {
+      type: 'user-left',
+      data: {
+        name: current_user.name,
+        current: room.subscribers.map{|s| s.name}
+      }
+    }.to_json
+  end
+
   def send_message(data)
     message = Message.create(user: current_user, room: room, content: data['text'])
     ChatChannel.broadcast_to room, message: {
