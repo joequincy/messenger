@@ -18,6 +18,11 @@
     App.elms.messageWindow.appendChild(new ChatMessage(data))
   }
 
+  App.announceExit = (data) => {
+    App.elms.messageWindow.appendChild(new UserLeftMessage(data))
+    App.elms.userList.querySelector('[data-name=' + data['name'] + ']').remove()
+  }
+
   App.subscribe = (details) => {
     App.room = App.cable.subscriptions.create(details, {
       connected: () => {
