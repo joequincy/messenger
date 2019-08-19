@@ -27,6 +27,14 @@
   display: none;
 }
 
+.messageWindow .messageUser::after {
+  content: ' says: '
+}
+
+.messageWindow .timestamp {
+  display: none; /* Not needed for demo */
+}
+
 #chatInput {
   width: 550px;
 }
