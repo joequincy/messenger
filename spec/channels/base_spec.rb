@@ -3,6 +3,7 @@ require 'rails_helper'
 describe ChatChannel, type: :channel do
   let(:user){ User.create(name: "Example") }
   let(:room){ Room.create(name: "Coding") }
+  let(:timestamp_format){ /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/ }
 
   it 'subscribes to a room' do
     stub_connection current_user: user
@@ -38,7 +39,7 @@ describe ChatChannel, type: :channel do
             user.name
           ]
         }
-        expect(payload).to eq(expected)
+        expect(payload).to include(expected)
       }
 
     next_user = User.create(name: 'YetAnotherExampleUser')
@@ -60,7 +61,7 @@ describe ChatChannel, type: :channel do
             next_user.name
           ]
         }
-        expect(payload).to eq(expected)
+        expect(payload).to include(expected)
       }
   end
 
@@ -112,7 +113,43 @@ describe ChatChannel, type: :channel do
         expected = {
           user: user.name,
           message: new_message['text'],
-          timestamp: a_string_matching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)
+          timestamp: a_string_matching(timestamp_format)
+        }
+        expect(payload).to include(expected)
+      }
+  end
+
+  it 'broadcasts last 5 messages when user joins' do
+    stub_connection current_user: user
+
+    message1 = Message.create(user: user, room: room, content: 'This is a message')
+    message2 = Message.create(user: user, room: room, content: 'This is also a message')
+    message3 = Message.create(user: user, room: room, content: 'This is not a message')
+    message4 = Message.create(user: user, room: room, content: 'JKJK')
+    message5 = Message.create(user: user, room: room, content: 'And now for something completely different')
+    message6 = Message.create(user: user, room: room, content: '[explosion sound]')
+
+    expect{subscribe room: room.name}
+      .to have_broadcasted_to(room)
+      .from_channel(ChatChannel)
+      .once
+      .with{ |data|
+        message = JSON.parse(data[:message], symbolize_names: true)
+        expect(message[:type]).to eq("user-joined")
+
+        payload = message[:data]
+        expected = {
+          name: user.name,
+          current: [
+            user.name
+          ],
+          lastMessages: [
+            {user: user.name, message: message2.content, timestamp: a_string_matching(timestamp_format)},
+            {user: user.name, message: message3.content, timestamp: a_string_matching(timestamp_format)},
+            {user: user.name, message: message4.content, timestamp: a_string_matching(timestamp_format)},
+            {user: user.name, message: message5.content, timestamp: a_string_matching(timestamp_format)},
+            {user: user.name, message: message6.content, timestamp: a_string_matching(timestamp_format)}
+          ]
         }
         expect(payload).to include(expected)
       }
