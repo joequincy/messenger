@@ -7,7 +7,8 @@ This challenge was completed using:
 - Rails 5.2.3
 - PostgreSQL 11.2
 
-To set up for demonstration:
+[I have an instance of this challenge set up on Heroku](https://code-challenge-messenger.herokuapp.com/) (using free dynos, so it may take a moment to spin up).  
+To set up for local demonstration:
 - clone this repository, `cd` into the project root, and run
 - `bundle install`
 - `rails db:{create,migrate,seed}`
