@@ -8,6 +8,11 @@
 (function() {
   this.App || (this.App = {});
 
+  App.announceUser = (data) => {
+    App.elms.messageWindow.appendChild(new UserArrivedMessage(data))
+    App.elms.userList.appendChild(new UserListItem(data))
+  }
+
   App.subscribe = (details) => {
     App.cable.subscriptions.create(details, {
       connected: () => {
