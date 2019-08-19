@@ -18,5 +18,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
     App.elms.chatInput = document.querySelector('#chatInput')
     App.elms.chatSubmit = document.querySelector('#chatSubmit')
+
+    App.elms.nameSubmit.addEventListener('click', ()=>{
+      App.cable = ActionCable.createConsumer('/ws?name=' + App.elms.nameInput.value)
+      App.elms.setup.classList.toggle('hidden')
+      App.elms.roomChooser.classList.toggle('hidden')
+      App.elms.chatWindow.classList.toggle('hidden')
+    })
   }).call(this);
 })
