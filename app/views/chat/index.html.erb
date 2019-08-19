@@ -1,0 +1,27 @@
+<%= tag.header do %>
+  <%= tag.h1 do %>Welcome to Messenger<% end %>
+<% end %>
+<%= tag.main do %>
+  <%= tag.section class: 'setup' do %>
+    Choose your handle:
+    <%= tag.input id: 'userNameInput' %>
+    <%= tag.button id: 'userNameSubmit' do %>Set<% end %>
+  <% end %>
+  <%= tag.section class: 'roomList hidden' do %>
+    Current Rooms:
+    <%= tag.select id: 'roomList' do %>
+      <%= options_from_collection_for_select rooms, :name, :name %>
+    <% end %>
+    Create Room:
+    <%= tag.input id: 'roomInput', type: 'text' %>
+    <%= tag.button id: 'chooseRoom' do %>Join<% end %>
+  <% end %>
+  <%= tag.section class: 'chatWindow hidden' do %>
+    <%= tag.section class: 'userList' %>
+    <%= tag.section class: 'messageWindow' %>
+    <%= tag.section class: 'messageInput' do %>
+      <%= tag.input id: 'chatInput', type: 'text' %>
+      <%= tag.button id: 'chatSubmit' do %>Send<% end %>
+    <% end %>
+  <% end %>
+<% end %>
