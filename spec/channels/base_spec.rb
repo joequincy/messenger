@@ -63,4 +63,27 @@ describe ChatChannel, type: :channel do
         expect(payload).to eq(expected)
       }
   end
+
+  it 'relays a message' do
+    stub_connection current_user: user
+    subscribe room: room.name
+    new_message = {'text' => 'This is a chat message'}
+
+    expect{subscription.send_message(new_message)}
+      .to have_broadcasted_to(room)
+      .from_channel(ChatChannel)
+      .once
+      .with{ |data|
+        message = JSON.parse(data[:message], symbolize_names: true)
+        expect(message[:type]).to eq("message")
+
+        payload = message[:data]
+        expected = {
+          user: user.name,
+          message: new_message['text'],
+          timestamp: a_string_matching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/)
+        }
+        expect(payload).to include(expected)
+      }
+  end
 end
