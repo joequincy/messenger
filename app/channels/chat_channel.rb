@@ -7,6 +7,18 @@ class ChatChannel < ApplicationCable::Channel
     stream_for room
   end
 
+  def send_message(data)
+    message = Message.create(user: current_user, room: room, content: data['text'])
+    ChatChannel.broadcast_to room, message: {
+      type: 'message',
+      data: {
+        user: current_user.name,
+        message: message.content,
+        timestamp: message.created_at
+      }
+    }.to_json
+  end
+
   private
     def announce_user
       ChatChannel.broadcast_to room, message: {
